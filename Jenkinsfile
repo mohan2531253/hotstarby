@@ -1,59 +1,55 @@
-You said:
 pipeline {
     agent any
+
+    environment {
+        DOCKER_HUB_USER = 'naren3005'     // your Docker Hub username
+        IMAGE_NAME = 'hotstar'            // your Docker Hub repository
+        IMAGE_TAG = 'v1'
+    }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main',
-                    credentialsId: 'your-credentials-id',
-                    url: 'https://github.com/mohan2531253/hotstarby.git'
+                git 
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build with Maven') {
             steps {
-                sh '''
-                docker rmi -f hotstar:v1 || true
-                docker build -t hotstar:v1 -f Dockerfile .
-                '''
+                sh 'mvn clean package'
             }
         }
+
+        stage('Docker Build Image') {
+            steps {
+                sh 'docker build -t $DOCKER_HUB_USER/$IMAGE_NAME:$IMAGE_TAG .'
+            }
+        }
+
         stage('Push to Docker Hub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh '''
-                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                        docker tag mytomcat $DOCKER_USER/mytomcat:latest
-                        docker push $DOCKER_USER/mytomcat:latest
-                        docker logout
-                    '''
+                withCredentials([usernamePassword(
+                      credentialsId: 'docker',  // use your actual credentials ID here
+                      usernameVariable: 'DOCKER_USER',
+                      passwordVariable: 'DOCKER_PASS'
+                   )]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    sh 'docker push $DOCKER_HUB_USER/$IMAGE_NAME:$IMAGE_TAG'
                 }
-            }
-        }
-        
-
-        stage('Deploy Container') {
-            steps {
-                sh '''
-                docker rm -f hotstar || true
-                docker run -d --name hotstar -p 9090:8080 hotstar:v1
-                '''
             }
         }
 
         stage('Docker Swarm Deploy') {
             steps {
-                echo 'Swarm deployment step (if needed)'
+                sh '''
+                docker service rm hotserv || true
+                docker service create \
+                  --name hotserv \
+                  -p 8008:8080 \
+                  --replicas 3 \
+                  $DOCKER_HUB_USER/$IMAGE_NAME:$IMAGE_TAG
+                '''
             }
         }
-        stage('docker push'){
-            steps{
-                docker.withRegistry('https://index.docker.io/v1/','docker-hub-credentials'){
-                    def app =
-                        docker.build("mohan2366/hotstar-app:${env.BUILD_NUMBER}")
-                    app.push()
-             }  
-         }
     }
 }
