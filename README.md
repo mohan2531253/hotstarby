@@ -1,3 +1,3 @@
-# hotstarby
+# hotstar
 naa hotstar
 ....
