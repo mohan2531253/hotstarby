@@ -23,7 +23,7 @@ pipeline {
             steps {
                 sh '''
                 docker rm -f hotstar || true
-                docker run -d --name hotstar -p 8080:8080 hotstar:v1
+                docker run -d --name hotstar -p 9090:8080 hotstar:v1
                 '''
             }
         }
