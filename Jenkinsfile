@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git https://github.com/mohan2531253/hotstarby.git
+                git 'https://github.com/mohan2531253/hotstarby.git'
             }
         }
 
