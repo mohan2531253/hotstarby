@@ -5,7 +5,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout code from main branch
-                git branch: 'main', url: 'https://github.com/Naren-05/hotstarby.git'
+                git branch: https://github.com/mohan2531253/hotstarby.git
 
                 // Verify files
                 sh 'pwd'
