@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_USER = 'naren3005'     // your Docker Hub username
+        DOCKER_HUB_USER = 'mohan2366'     // your Docker Hub username
         IMAGE_NAME = 'hotstar'            // your Docker Hub repository
         IMAGE_TAG = 'v1'
     }
@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 
+                git https://github.com/mohan2531253/hotstarby.git
             }
         }
 
