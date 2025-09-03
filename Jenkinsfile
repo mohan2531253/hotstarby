@@ -2,15 +2,17 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_USER = 'mohan2366'     // your Docker Hub username
-        IMAGE_NAME = 'hotstar'            // your Docker Hub repository
+        DOCKER_HUB_USER = 'mohan2366'     // Docker Hub username
+        IMAGE_NAME = 'hotstar'            // Docker Hub repository name
         IMAGE_TAG = 'v1'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/mohan2531253/hotstarby.git'
+                git branch: 'main',
+                    credentialsId: 'mohan2531253', 
+                    url: 'https://github.com/mohan2531253/hotstarby.git'
             }
         }
 
@@ -29,7 +31,7 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 withCredentials([usernamePassword(
-                      credentialsId: 'docker',  // use your actual credentials ID here
+                      credentialsId: 'docker',  
                       usernameVariable: 'DOCKER_USER',
                       passwordVariable: 'DOCKER_PASS'
                    )]) {
