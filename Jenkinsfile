@@ -18,6 +18,19 @@ pipeline {
                 '''
             }
         }
+        stage('Push to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker tag mytomcat $DOCKER_USER/mytomcat:latest
+                        docker push $DOCKER_USER/mytomcat:latest
+                        docker logout
+                    '''
+                }
+            }
+        }
+        
 
         stage('Deploy Container') {
             steps {
@@ -33,5 +46,13 @@ pipeline {
                 echo 'Swarm deployment step (if needed)'
             }
         }
+        stage('docker push'){
+            steps{
+                docker.withRegistry('https://index.docker.io/v1/','docker-hub-credentials'){
+                    def app =
+                        docker.build("mohan2366/hotstar-app:${env.BUILD_NUMBER}")
+                    app.push()
+             }  
+         }
     }
 }
